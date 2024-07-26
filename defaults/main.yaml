@@ -1,0 +1,12 @@
+---
+install_packages: []
+remove_packages: []
+# Use
+# services:
+#   { name: "a", reload: t/[F], state: restarted, enabled: [T].f}
+services: []
+do_update: true
+# gen_dirs:
+#   { dir: "/a", owner: "root", group: "root"}
+gen_dirs: []
+remove_items: []

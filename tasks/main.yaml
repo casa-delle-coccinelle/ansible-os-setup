@@ -1,0 +1,54 @@
+---
+- name: Remove items
+  ansible.builtin.file:
+    state: absent
+    path: "{{ item }}"
+  with_items: ["{{ remove_items }}"]
+
+- name: Add dirs
+  ansible.builtin.file:
+    state: directory
+    path: "{{ item.dir }}"
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | item.owner | default('root') }}"
+  with_items: ["{{ gen_dirs }}"]
+
+- name: Remove Packages
+  ansible.builtin.dnf:
+    name: "{{ remove_packages }}"
+    state: removed
+
+- name: Upgrade all packages
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest
+  when: do_update
+
+- name: Install Packages
+  ansible.builtin.dnf:
+    name: "{{ install_packages + mandatory_packages }}"
+    state: present
+
+- name: Start SVCs
+  ansible.builtin.systemd_service:
+    name: "{{ item.name }}"
+    enabled: "{{ item.enabled | default(true) }}"
+    state: "{{ item.state | default('restarted') }}"
+    daemon_reload: "{{ item.reload | default(false) }}"
+  with_items: ["{{ services }}"]
+
+- name: Do sensors
+  ansible.builtin.shell: yes | sensors-detect > /tmp/sensors_detected
+  args:
+    creates: /tmp/sensors_detected
+
+- name: Setup kitty
+  block:
+    - name: Add dir
+      ansible.builtin.file:
+        state: directory
+        path: "{{ ansible_user_dir }}/.terminfo/"
+    - name: Copy the terminfo
+      ansible.builtin.copy:
+        src: kitty/kitty.terminfo
+        dest: "{{ ansible_user_dir }}/.terminfo/kitty.terminfo"

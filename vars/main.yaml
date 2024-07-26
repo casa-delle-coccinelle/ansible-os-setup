@@ -1,0 +1,6 @@
+---
+mandatory_packages:
+  - lm_sensors
+  - tar
+  - unzip
+  - htop
