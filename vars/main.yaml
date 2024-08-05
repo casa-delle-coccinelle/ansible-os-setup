@@ -5,3 +5,4 @@ mandatory_packages:
   - unzip
   - htop
   - nvme-cli
+  - pciutils # lspci
