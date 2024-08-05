@@ -4,3 +4,4 @@ mandatory_packages:
   - tar
   - unzip
   - htop
+  - nvme-cli
