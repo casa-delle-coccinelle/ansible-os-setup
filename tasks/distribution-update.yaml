@@ -1,0 +1,20 @@
+---
+- name: Generate next version
+  set_fact:
+    ansible_distribution_next_version: "{{ ansible_distribution_version | int + 1 }}"
+
+- name: Update to Next version
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - "fedora-{{ ansible_distribution_version }}-to-fedora-{{ ansible_distribution_next_version }}.yaml"
+    - /dev/null
+
+- name: Cleanup post-install
+  block:
+    - name: Ensure cleanup is possible
+      ansible.builtin.dnf:
+        name: remove-retired-packages
+        state: latest
+
+    - name: Cleanup old packages
+      shell: remove-retired-packages && dnf autoremove

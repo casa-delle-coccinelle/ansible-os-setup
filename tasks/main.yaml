@@ -10,8 +10,12 @@
     state: directory
     path: "{{ item.dir }}"
     owner: "{{ item.owner | default('root') }}"
-    group: "{{ item.group | item.owner | default('root') }}"
+    group: "{{ item.group | default(item.owner | default('root')) }}"
   with_items: ["{{ gen_dirs }}"]
+
+- name: Do OS updates
+  ansible.builtin.include_tasks: distribution-update.yaml
+  when: do_dist_update
 
 - name: Remove Packages
   ansible.builtin.dnf:

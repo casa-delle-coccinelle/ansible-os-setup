@@ -10,3 +10,5 @@ do_update: true
 #   { dir: "/a", owner: "root", group: "root"}
 gen_dirs: []
 remove_items: []
+
+do_dist_update: false
