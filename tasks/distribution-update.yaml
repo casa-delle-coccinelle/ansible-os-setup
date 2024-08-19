@@ -17,4 +17,4 @@
         state: latest
 
     - name: Cleanup old packages
-      shell: remove-retired-packages && dnf autoremove
+      shell: remove-retired-packages && dnf autoremove -y

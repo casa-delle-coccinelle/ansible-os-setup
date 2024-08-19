@@ -12,3 +12,8 @@ gen_dirs: []
 remove_items: []
 
 do_dist_update: false
+server_hostname:  # Hostname to be set
+dhcp_global_domain_name: local.casa-delle-coccinelle.link
+selinux_state: permissive
+timezone: Europe/Sofia
+do_disable_firewalld: false

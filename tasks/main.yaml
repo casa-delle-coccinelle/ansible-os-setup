@@ -1,4 +1,10 @@
 ---
+- name: Set hostname
+  hostname:
+    name: "{{ server_hostname }}.{{ dhcp_global_domain_name }}"
+    use: systemd
+  when: server_hostname
+
 - name: Remove items
   ansible.builtin.file:
     state: absent
@@ -10,7 +16,7 @@
     state: directory
     path: "{{ item.dir }}"
     owner: "{{ item.owner | default('root') }}"
-    group: "{{ item.group | default(item.owner | default('root')) }}"
+    group: "{{ item.group | default('root') }}"
   with_items: ["{{ gen_dirs }}"]
 
 - name: Do OS updates
@@ -33,6 +39,11 @@
     name: "{{ install_packages + mandatory_packages }}"
     state: present
 
+- name: Set SELinux to permissive
+  selinux:
+    state: "{{ selinux_state }}"
+    policy: targeted
+
 - name: Start SVCs
   ansible.builtin.systemd_service:
     name: "{{ item.name }}"
@@ -45,6 +56,20 @@
   ansible.builtin.shell: yes | sensors-detect > /tmp/sensors_detected
   args:
     creates: /tmp/sensors_detected
+
+- name: Configure power behavior
+  template:
+    dest: /etc/systemd/logind.conf
+    src: logind.conf.j2
+
+- name: Set TZ
+  timezone:
+    name: "{{ timezone }}"
+    hwclock: UTC
+
+- name: Disable firewalld
+  include_tasks: disable_firewalld.yaml
+  when: do_disable_firewalld
 
 - name: Setup kitty
   block:
