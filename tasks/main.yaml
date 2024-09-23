@@ -17,6 +17,8 @@
     path: "{{ item.dir }}"
     owner: "{{ item.owner | default('root') }}"
     group: "{{ item.group | default('root') }}"
+    recurse: "{{ item.recurse | default(true) }}"
+    mode: "{{ item.mode | default(true) }}"
   with_items: ["{{ gen_dirs }}"]
 
 - name: Do OS updates
