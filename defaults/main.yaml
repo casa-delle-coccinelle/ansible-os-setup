@@ -17,3 +17,34 @@ dhcp_global_domain_name: local.casa-delle-coccinelle.link
 selinux_state: permissive
 timezone: Europe/Sofia
 do_disable_firewalld: false
+
+# Pickup from the automated install
+bootstrap_base_url: https://straps.casa-delle-coccinelle.link
+ca_conf_uri: access/10-ca.conf
+ca_conf_dest: /etc/ssh/sshd_config.d/10-ca.conf
+
+ca_key_pub_uri: access/ca_key.pub
+ca_key_pub_dest: /etc/ssh/ca_key.pub
+
+revoked_keys_uri: access/revoked_keys
+revoked_keys_dest: /etc/ssh/revoked_keys
+
+sudoers_users:
+  - user
+  - nelly
+
+# Autologin happens only for servers
+# Servers are identified by the presence of a file /is_srv
+autologin:
+  address_script:
+    uri: access/address.sh
+    dest: /scripts/address.sh
+  autologin_script:
+    uri: access/autologin.sh
+    dest: /scripts/autologin.sh
+  autologin:
+    uri: access/autologin.conf
+    dest: /etc/systemd/system/getty@tty1.service.d/autologin.conf
+  override:
+    uri: access/override.conf
+    dest: /etc/systemd/system/getty@tty1.service.d/override.conf

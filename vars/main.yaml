@@ -8,3 +8,4 @@ mandatory_packages:
   - pciutils  # lspci
   - socat
   - python3-libselinux
+  - tmux

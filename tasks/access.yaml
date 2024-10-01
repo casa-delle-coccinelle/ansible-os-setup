@@ -1,0 +1,52 @@
+---
+- name: Check if server
+  ansible.builtin.stat:
+    path: /is_srv
+  register: srv_file
+
+- name: Set is_srv fact
+  ansible.builtin.set_fact:
+    is_srv: "{{ srv_file.stat.exists }}"
+
+
+- name: Pull configs
+  ansible.builtin.get_url:
+    url: "{{ bootstrap_base_url }}/{{ item.uri }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - uri: "{{ ca_conf_uri }}"
+      dest: "{{ ca_conf_dest }}"
+    - uri: "{{ ca_key_pub_uri }}"
+      dest: "{{ ca_key_pub_dest }}"
+    - uri: "{{ revoked_keys_uri }}"
+      dest: "{{ revoked_keys_dest }}"
+
+- name: Configure autologin for servers
+  block:
+    - name: Ensure required dirs exists
+      ansible.builtin.file:
+        state: directory
+        recurse: true
+        path: "{{ item }}"
+      with_items:
+        - /scripts
+        - /etc/systemd/system/getty@tty1.service.d/
+    - name: Pull autologin config
+      ansible.builtin.get_url:
+        url: "{{ bootstrap_base_url }}/{{ item.uri }}"
+        dest: "{{ item.dest }}"
+      with_items:
+        - uri: "{{ autologin.address_script.uri }}"
+          dest: "{{ autologin.address_script.dest }}"
+        - uri: "{{ autologin.autologin_script.uri }}"
+          dest: "{{ autologin.autologin_script.dest }}"
+        - uri: "{{ autologin.autologin.uri }}"
+          dest: "{{ autologin.autologin.dest }}"
+        - uri: "{{ autologin.override.uri }}"
+          dest: "{{ autologin.override.dest }}"
+  when: is_srv
+
+- name: Allow no-pass sudoers
+  ansible.builtin.template:
+    src: sudoers.j2
+    dest: /etc/sudoers.d/users

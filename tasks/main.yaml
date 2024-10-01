@@ -69,6 +69,9 @@
     name: "{{ timezone }}"
     hwclock: UTC
 
+- name: Configure access
+  ansible.builtin.include_tasks: access.yaml
+
 - name: Disable firewalld
   include_tasks: disable_firewalld.yaml
   when: do_disable_firewalld
