@@ -9,3 +9,5 @@ mandatory_packages:
   - socat
   - python3-libselinux
   - tmux
+  - cronie
+  - cronie-anacron
