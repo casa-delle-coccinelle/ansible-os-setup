@@ -20,6 +20,8 @@
       dest: "{{ ca_key_pub_dest }}"
     - uri: "{{ revoked_keys_uri }}"
       dest: "{{ revoked_keys_dest }}"
+  notify:
+    - Restart sshd
 
 - name: Configure autologin for servers
   block:
@@ -46,7 +48,18 @@
           dest: "{{ autologin.override.dest }}"
   when: is_srv
 
+- name: Configure_users
+  ansible.builtin.include_tasks: configure_users.yaml
+  with_items: "{{ sudoers_users }}"
+
 - name: Allow no-pass sudoers
   ansible.builtin.template:
     src: sudoers.j2
     dest: /etc/sudoers.d/users
+
+- name: Ensure 01-permitrootlogin.conf does not exists
+  ansible.builtin.file:
+    path: /etc/ssh/sshd_config.d/01-permitrootlogin.conf
+    state: absent
+  notify:
+    - Restart sshd

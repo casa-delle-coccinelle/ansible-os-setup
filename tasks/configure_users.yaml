@@ -1,0 +1,16 @@
+---
+- name: Check if user exists
+  command: "getent passwd {{ item }}"
+  register: user_info
+  ignore_errors: true
+
+- name: Create a group if the user does not exists
+  group:
+    name: "{{ item }}"
+
+- name: Create user if it does not exists
+  user:
+    name: "{{ item }}"
+    group: "{{ item }}"
+    create_home: true
+  when: user_info.rc != 0
