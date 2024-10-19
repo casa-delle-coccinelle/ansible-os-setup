@@ -32,6 +32,7 @@ revoked_keys_dest: /etc/ssh/revoked_keys
 sudoers_users:
   - user
   - nelly
+  - operator
 
 # Autologin happens only for servers
 # Servers are identified by the presence of a file /is_srv
